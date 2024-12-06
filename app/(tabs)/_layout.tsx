@@ -1,45 +1,88 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import {
+  Camera,
+  Chats,
+  Reload,
+  Settings,
+  Notification,
+  AddCircle,
+} from "@/components/ui/icon";
+import Colors from "@/constants/Colors";
+import { Link, Tabs, useSegments } from "expo-router";
+import { Pressable, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+const TabsLayout = () => {
+  const segments = useSegments();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: Colors.icon,
+            height: 70,
+            justifyContent: "center",
           },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarInactiveBackgroundColor: Colors.primary,
+          tabBarActiveBackgroundColor: Colors.primary,
+          headerStyle: {
+            backgroundColor: Colors.primary,
+          },
+          headerShadowVisible: false,
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Chats",
+            tabBarIcon: () => <Chats />,
+            headerShown: true,
+            tabBarStyle: {
+              height: 70,
+              justifyContent: "center",
+              backgroundColor: Colors.icon,
+              display: segments[1] === "[contactId]" ? "none" : "flex",
+            },
+            headerRight: () => (
+              <View style={{ flexDirection: "row", marginRight: 15, gap: 12 }}>
+                <Pressable>
+                  <Camera />
+                </Pressable>
+                <Link href={"/(contact)/contact"} asChild>
+                  <Pressable>
+                    <AddCircle />
+                  </Pressable>
+                </Link>
+              </View>
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="news"
+          options={{
+            title: "Novedades",
+            tabBarIcon: () => <Reload />,
+            headerShown: false,
+          }}
+        />
+        <Tabs.Screen
+          name="notification"
+          options={{
+            title: "Notificacion",
+            tabBarIcon: () => <Notification />,
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: "Configuracion",
+            tabBarIcon: () => <Settings />,
+          }}
+        />
+      </Tabs>
+    </GestureHandlerRootView>
   );
-}
+};
+
+export default TabsLayout;
