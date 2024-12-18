@@ -81,6 +81,7 @@ export interface Database {
           full_name: string | null;
           id: string;
           updated_at: string | null;
+          gender: string | null;
           username: string | null;
           website: string | null;
         };

@@ -42,7 +42,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         router.replace("/(tabs)");
       } else {
         setSession(null);
-        router.replace("..");
+        router.push("/(auth)");
       }
     });
   }, [router]);

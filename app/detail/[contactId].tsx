@@ -1,4 +1,4 @@
-import { Call, VideoCam } from "@/components/ui/icon";
+import { Attachment, Call, VideoCam } from "@/components/ui/icon";
 import { useAuth } from "@/context/authContext";
 import {
   fetchMessages,
@@ -72,6 +72,33 @@ const DetailChatPage = () => {
     };
   }, [user, contactId]);
 
+  const handlePickImage = useCallback(async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0]?.base64) {
+      const imageBase64 = `data:image/jpeg;base64,${result.assets[0]?.base64}`;
+
+      const { error, data } = await supabase
+        .from("messages")
+        .insert({
+          sender_id: user?.id || "",
+          receiver_id: contactId,
+          content: imageBase64,
+        })
+        .select("*");
+
+      if (error) {
+        Alert.alert("Server Error", error.message);
+      } else {
+        setMessages((prevMessages) => [data[0], ...prevMessages]);
+      }
+    }
+  }, []);
+
   const onSend = useCallback(async (messages = []) => {
     const [message] = messages;
     const { text } = message;
@@ -140,16 +167,29 @@ const DetailChatPage = () => {
         }}
       />
       <GiftedChat
-        messages={messages.map((message) => ({
-          _id: message?.id,
-          text: message?.content,
-          createdAt: new Date(message?.created_at),
-          user: { _id: message?.sender_id },
-        }))}
+        messages={messages.map((message) => {
+          const isImage = message?.content?.startsWith("data:image");
+
+          return {
+            _id: message?.id,
+            text: isImage ? "" : message?.content, // No mostrar texto si es una imagen
+            image: isImage ? message?.content : undefined, // Asignar la imagen si es base64
+            createdAt: new Date(message?.created_at),
+            user: { _id: message?.sender_id },
+          };
+        })}
         onSend={(messages: any) => onSend(messages)}
         user={{
           _id: user?.id || "",
         }}
+        renderActions={() => (
+          <Pressable
+            onPress={handlePickImage}
+            style={{ marginBottom: 10, marginLeft: 5 }}
+          >
+            <Attachment />
+          </Pressable>
+        )}
       />
     </KeyboardAvoidingView>
   );

@@ -28,6 +28,7 @@ const AuthPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [gender, setGender] = useState("");
   const [loading, setLoading] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertTitle, setAlertTitle] = useState("");
@@ -41,18 +42,18 @@ const AuthPage = () => {
       password &&
       isValidEmail(email) &&
       (mode === "signUp"
-        ? username && confirmPassword && password === confirmPassword
+        ? username && confirmPassword && password === confirmPassword && gender
         : true);
 
     setIsButtonDisabled(!isFormValid);
-  }, [email, password, username, confirmPassword, mode]);
+  }, [email, password, username, confirmPassword, gender, mode]);
 
   const handleSubmit = async () => {
     setLoading(true);
     if (
       !email ||
       !password ||
-      (mode === "signUp" && (!username || !confirmPassword))
+      (mode === "signUp" && (!username || !confirmPassword || !gender))
     ) {
       setAlertTitle("Error");
       setAlertMessage("Por favor, completa todos los campos");
@@ -78,6 +79,7 @@ const AuthPage = () => {
         options: {
           data: {
             username,
+            gender,
           },
         },
       });
@@ -147,7 +149,15 @@ const AuthPage = () => {
                 >
                   <Email />
                 </Input>
-
+                {mode === "signUp" && (
+                  <Input
+                    placeholder="Masculino-Femenino"
+                    onChangeText={(text) => setGender(text)}
+                    keyboardType="default"
+                  >
+                    <Lock />
+                  </Input>
+                )}
                 <Input
                   placeholder="Contraseña"
                   onChangeText={(text) => setPassword(text)}

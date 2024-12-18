@@ -12,8 +12,8 @@ const ContactPage = () => {
   const { profile } = useAuth();
 
   useEffect(() => {
-    if (profile) {
-      fetchContacts(profile.id).then(setContactFulls);
+    if (profile && profile.gender) {
+      fetchContacts(profile.id, profile.gender).then(setContactFulls);
     }
   }, [profile]);
 

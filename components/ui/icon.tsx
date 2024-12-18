@@ -1,4 +1,4 @@
-import { Ionicons, SimpleLineIcons } from "@expo/vector-icons";
+import { Entypo, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 
 export const VideoCam = () => (
   <Ionicons name="videocam-outline" size={30} color="#1063FD" />
@@ -59,3 +59,7 @@ export const Reload = () => (
   <SimpleLineIcons name="reload" size={30} color="gray" />
 );
 export const User = () => <Ionicons name="person" size={25} color="gray" />;
+
+export const Attachment = () => (
+  <Entypo name="attachment" size={25} color="black" />
+);

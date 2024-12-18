@@ -11,7 +11,7 @@ const SettingsPage = () => {
     if (error) {
       Alert.alert("Sign out", "Error signing out!"); // Mostrar alerta si ocurre un error
     } else {
-      router.replace("..");
+      router.push("/");
     }
   };
   const { profile, loading, saveProfile } = useAuth();

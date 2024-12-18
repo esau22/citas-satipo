@@ -74,11 +74,23 @@ export const fetchLikes = async (postId: string) => {
 export type Likes = Awaited<ReturnType<typeof fetchLikes>>;
 export type Like = Likes[number];
 
-export const fetchContacts = async (userId: string) => {
+export const fetchContacts = async (
+  userId: string,
+  userGender: string | null
+) => {
+  if (!userGender) {
+    console.log("No se pudo determinar el género del usuario");
+    return [];
+  }
+
+  const genderFilter = userGender === "Masculino" ? "Femenina" : "Masculino";
+
   const { data, error } = await supabase
     .from("profiles")
-    .select("username, avatar_url, id")
-    .neq("id", userId);
+    .select("username, avatar_url, id, gender")
+    .neq("id", userId)
+    .eq("gender", genderFilter); // Filtramos según el género
+
   if (error) {
     console.log("error", error);
     return [];
@@ -134,11 +146,16 @@ export const fetchChats = async (userId: string) => {
         !msg.read // Mensajes no leídos
     ).length;
 
+    const isImage =
+      lastMessage && lastMessage.content.startsWith("data:image/");
+
     return {
       id: profile.id,
       username: profile.username,
       avatar_url: profile.avatar_url,
-      last_message: lastMessage ? lastMessage.content : "No hay mensajes",
+      last_message: isImage
+        ? "📷 Imagen"
+        : lastMessage?.content || "No hay mensajes",
       created_at: lastMessage ? lastMessage.created_at : "",
       unread_count: unreadCount || 0,
     };
@@ -178,36 +195,20 @@ export const fetchMessages = async (userId: string, contactId: string) => {
     .order("created_at", { ascending: false });
 
   if (error) {
-    //console.log("Error al obtener mensajes:", error.message);
+    console.log("Error al obtener mensajes:", error.message);
     return [];
   }
 
-  if (data && data.length > 0) {
-    // Filtramos los mensajes que aún no están marcados como leídos
-    const unreadMessages = data.filter((message) => !message.read);
-
-    if (unreadMessages.length > 0) {
-      //console.log("Mensajes no leídos a actualizar:", unreadMessages);
-
-      const updateResponse = await supabase
-        .from("messages")
-        .update({ read: true })
-        .in(
-          "id",
-          unreadMessages.map((message) => message.id)
-        );
-
-      if (updateResponse.error) {
-        console.log(
-          "Error al actualizar mensajes:",
-          updateResponse.error.message
-        );
-      } else {
-        //console.log("Mensajes actualizados correctamente:", updateResponse);
-      }
-    } else {
-      //console.log("No hay mensajes no leídos para actualizar.");
-    }
+  // Actualización de estado de mensajes no leídos (opcional)
+  const unreadMessages = data?.filter((message) => !message.read);
+  if (unreadMessages?.length > 0) {
+    await supabase
+      .from("messages")
+      .update({ read: true })
+      .in(
+        "id",
+        unreadMessages.map((message) => message.id)
+      );
   }
 
   return data;
