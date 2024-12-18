@@ -39,10 +39,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         setSession(session);
-        router.replace("/(tabs)");
-      } else {
-        setSession(null);
-        router.push("/(auth)");
+        router.push("/(tabs)");
       }
     });
   }, [router]);
