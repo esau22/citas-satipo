@@ -18,7 +18,7 @@ const CardChat = ({ contact, onPress, contactFull }: CardChatProps) => {
       downloadAvatar(contact?.avatar_url || contactFull?.avatar_url).then(
         setAvatarUrl
       );
-  }, [contact]);
+  }, [contact, contactFull]);
   //console.log("imge", contact.avatar_url);
 
   return (
