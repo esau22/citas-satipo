@@ -5,6 +5,7 @@ import Container from "@/components/ui/container";
 import { Email, User, Lock, ArrowBack } from "@/components/ui/icon";
 import Input from "@/components/ui/input";
 import Logo from "@/components/ui/logo";
+import Select from "@/components/ui/select";
 import { supabase } from "@/lib/supabase";
 import { isValidEmail } from "@/utils/isValidEmail";
 import { useRouter } from "expo-router";
@@ -150,13 +151,17 @@ const AuthPage = () => {
                   <Email />
                 </Input>
                 {mode === "signUp" && (
-                  <Input
-                    placeholder="Masculino-Femenino"
-                    onChangeText={(text) => setGender(text)}
-                    keyboardType="default"
+                  <Select
+                    value={gender}
+                    placeholder="Selecciona un género"
+                    onValueChange={(value) => setGender(value)}
+                    options={[
+                      { label: "Masculino", value: "Masculino" },
+                      { label: "Femenina", value: "Femenina" },
+                    ]}
                   >
                     <Lock />
-                  </Input>
+                  </Select>
                 )}
                 <Input
                   placeholder="Contraseña"
